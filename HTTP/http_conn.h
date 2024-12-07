@@ -134,7 +134,7 @@ private:
 	int bytes_to_send; //剩余发送字节数
 	int bytes_have_send; //已发送字节数
 
-	
+
 };
 
 
