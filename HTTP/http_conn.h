@@ -11,6 +11,10 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <stdarg.h>
 
 class http_conn
 {
@@ -24,7 +28,7 @@ public:
 	//报文的请求方法,只使用GET和POST
 	enum METHOD{GET=0,POST,HEAD,PUT,DELETE,TRACE,OPTIONS,CONNECT,PATH};
 	//主状态机状态
-	enum CHECK_STATE{CHECK_STATE_REQUESTLINE=0,CHECK_STATE_HEADER,CHECK_STATE_CONNECT};
+	enum CHECK_STATE{CHECK_STATE_REQUESTLINE=0,CHECK_STATE_HEADER,CHECK_STATE_CONTENT};
 	//报文解析结果
 	enum HTTP_CODE{NO_REQUEST,GET_REQUEST,BAD_REQUEST,NO_RESOURCE,FORBIDDEN_REQUEST,FILE_REQUEST,INTERNAL_ERROR,CLOSED_CONNECTION};
 	//从状态机状态
@@ -106,7 +110,7 @@ private:
 
 	//存储发出的响应报文数据
 	char write_buf[WRITE_BUFFER_SIZE];
-	//指示buf中的长度
+	//指示write_buf中的长度
 	int write_idx;
 
 	//主状态机的状态
@@ -129,11 +133,12 @@ private:
 	struct stat file_stat;
 	struct iovec iv[2]; //io向量机制iovec
 	int iv_count;
-	int cgi; //是否启用的POST
-	char* header_string; //存储请求头数据
+	bool cgi; //是否启用的POST
+	char* m_string; //存储请求数据
 	int bytes_to_send; //剩余发送字节数
 	int bytes_have_send; //已发送字节数
 
+	char* doc_root; //网站根目录
 
 };
 
